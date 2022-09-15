@@ -1,3 +1,4 @@
+
 const main=document.querySelector(".main");
 fetch(genres_list_http+new URLSearchParams({
     api_key:api_key
@@ -18,6 +19,7 @@ const fetchMovieSListByGenres=(id,genres) => {
     .then(res=>res.json())
     .then(data=> {
         makeCategoryElement(`${genres}_movies`,data.results);
+        
     })
     .catch(err => console.log(err));
 }
@@ -46,6 +48,7 @@ const makeCards=(id,data) => {
                 return;
             }
         }
+        // console.log(item.id);
         movieContainer.innerHTML+=`
         <div class="movie" onclick="location.href='/${item.id}'">
             <img src="${img_url}${item.backdrop_path}" alt="">
@@ -60,3 +63,42 @@ const makeCards=(id,data) => {
         }
     })
 }
+
+// ***************fetching serached movie********************
+
+const submitBtn=document.getElementById('submitBtn');
+const userInput=document.getElementById('userName');
+
+var username,movie;
+const getInfo=async(event)=>{
+    let userVal=userInput.value;
+    if(userVal===""){
+        alert("write something to search");
+    }else{
+        try{
+            fetch(search_movie_http+new URLSearchParams({
+                        api_key:api_key,
+                        query:userVal
+                    }))
+                    .then(res=>res.json())
+                    .then(data=> {
+                        movie=data.results[0];
+                        location.href=`${movie.id}`
+                    });
+        }catch{
+            alert("oops!! not find");
+        }
+    }
+}
+submitBtn.addEventListener('click',getInfo);
+
+
+// *******************fetching trending movie***************************
+
+fetch(trending_movie_http+new URLSearchParams({
+    api_key:api_key
+}))
+.then(res=>res.json())
+.then(data=> {
+    console.log(data.results[2]);
+});

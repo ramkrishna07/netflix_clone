@@ -5,15 +5,26 @@ fetch(`${movie_detail_http}${movie_id}?`+new URLSearchParams({
 }))
 .then(res=>res.json())
 .then(data=>{
+    console.log(data);
    setupMovieInfo(data);
 })
 
 const setupMovieInfo= (data) =>{
+    const backdrop=document.querySelector('.movie-info');
+
+    backdrop.innerHTML+=`
+    <img src="${original_img_url}${data.backdrop_path}" alt="" class="background-img">
+    <div class="movie-details">
+      <h1 class="movie-name"></h1>
+      <p class="genres"></p>
+      <p class="des"></p>
+      <p class="starring"><span>starring:</span></p>
+    </div>
+    `
     const movieName=document.querySelector('.movie-name');
     const genres=document.querySelector('.genres');
     const des=document.querySelector('.des');
     const title=document.querySelector('title');
-    const backdrop=document.querySelector('.movie-info');
 
     title.innerHTML=movieName.innerHTML=data.title;
     genres.innerHTML=`${data.release_date.split('-')[0]} | `;
@@ -29,15 +40,17 @@ const setupMovieInfo= (data) =>{
         data.backdrop_path=data.poster_path;
     }
     des.innerHTML=data.overview.substring(0,200)+'...';
-
-    backdrop.style.backgroundImage=`url(${original_img_url}${data.backdrop_path})`;
+    backdrop.innerHTML+=`
+    
+    `
+    // backdrop.style.backgroundImage=`url(${original_img_url}${data.backdrop_path})`;
 }
 
 const formatString=(currentIndex,maxIndex)=>{
     return (currentIndex==maxIndex-1)? '' : ',';
 }
 
-// fetching cast information
+// *********************fetching cast information**********************
 
 fetch(`${movie_detail_http}${movie_id}/credits?`+new URLSearchParams({
     api_key:api_key
@@ -50,7 +63,30 @@ fetch(`${movie_detail_http}${movie_id}/credits?`+new URLSearchParams({
     }
 })
 
-// fetching video clips
+// ********************fetching images******************
+
+fetch(`${movie_detail_http}${movie_id}/images?`+ new URLSearchParams({
+    api_key:api_key
+}))
+.then(res=>res.json())
+.then(data=>{
+    console.log(data.backdrops);
+    makeCards(data)
+})
+const makeCards=(data)=>{
+    const imageContainer=document.querySelector(".movie-img-container");
+    for(let i=0;i<40;i++){
+        imageContainer.innerHTML+=`
+        <div class="movie-img">
+        <img src="${original_img_url}${data.backdrops[i].file_path}" alt="">
+            </div>
+        `;
+    }
+}
+
+
+
+// ******************fetching video clips*********************
 
 fetch(`${movie_detail_http}${movie_id}/videos?` + new URLSearchParams({
     api_key:api_key
@@ -66,7 +102,7 @@ fetch(`${movie_detail_http}${movie_id}/videos?` + new URLSearchParams({
     }
 })
 
-// fetch recommendations
+// *******************fetch recommendations*******************
 
 fetch(`${movie_detail_http}${movie_id}/recommendations?` + new URLSearchParams({
     api_key:api_key
@@ -94,12 +130,34 @@ fetch(`${trending_video_http}/day?`+new URLSearchParams({
 }))
 .then(res=>res.json())
 .then(data=>{
-    console.log(data);
+    // console.log(data);
 })
-// fetch(`${latest_http}/latest?`+new URLSearchParams({
-//     api_key:api_key
-// }))
-// .then(res=>res.json())
-// .then(data=>{
-//     console.log(data);
-// })
+
+// ***************fetching serached movie********************
+
+const FormContainer=document.querySelector(".form-container");
+const submitBtn=document.getElementById('submitBtn');
+const userInput=document.getElementById('userName');
+
+var username,movie;
+const getInfo=async(event)=>{
+    let userVal=userInput.value;
+    if(userVal===""){
+        alert("please write");
+    }else{
+        try{
+            fetch(search_movie_http+new URLSearchParams({
+                        api_key:api_key,
+                        query:userVal
+                    }))
+                    .then(res=>res.json())
+                    .then(data=> {
+                        movie=data.results[0];
+                        location.href=`${movie.id}`
+                    });
+        }catch{
+            alert("error");
+        }
+    }
+}
+submitBtn.addEventListener('click',getInfo);

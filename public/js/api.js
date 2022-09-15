@@ -11,3 +11,7 @@ let movie_detail_http="https://api.themoviedb.org/3/movie";
 
 let trending_video_http="https://api.themoviedb.org/3/trending/all";
 // let latest_http="https://api.themoviedb.org/3/movie";
+
+let search_movie_http="https://api.themoviedb.org/3/search/movie?";
+
+let trending_movie_http="https://api.themoviedb.org/3/trending/movie/week?";
